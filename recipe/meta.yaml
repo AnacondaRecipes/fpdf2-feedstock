@@ -61,6 +61,7 @@ about:
     in Python. It is a fork and the successor of PyFPDF.
   license: LGPL-3.0-or-later
   license_file: LICENSE
+  license_family: LGPL
 
 extra:
   recipe-maintainers:
