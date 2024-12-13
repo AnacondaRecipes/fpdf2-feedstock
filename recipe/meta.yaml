@@ -27,12 +27,29 @@ requirements:
     - python
 
 test:
+  source_files:
+    - test
+    # Used in image tests
+    - docs/fpdf2-logo.png
+
   imports:
     - fpdf
   commands:
     - pip check
+    {% set pytest_skip = "test_encryption_unicode" %} # Requires uharfbuzz
+    {% set pytest_skip = pytest_skip + " or test_sign_pkcs12" %} # Requires endesive
+    {% set pytest_skip = pytest_skip + " or test_insert_jpg_jpxdecode" %}
+    {% set pytest_skip = pytest_skip + " or test_insert_jpg_flatedecode" %}
+    {% set pytest_skip = pytest_skip + " or test_insert_png_alpha_dctdecode" %}
+    {% set pytest_skip = pytest_skip + " or test_page_background" %}
+
+    - pytest test --ignore=test/table/test_table_extraction.py --ignore=test/text_shaping -k "not ({{ pytest_skip }})"
   requires:
     - pip
+    - pytest
+    - qrcode
+    - cryptography
+    - lxml
 
 about:
   home: https://pyfpdf.github.io/fpdf2/
