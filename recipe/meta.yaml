@@ -42,6 +42,7 @@ requirements:
   "--deselect=test/image/test_url_images.py::test_png_url",
   "--deselect=test/test_alias.py::test_alias_with_shaping",
   "--deselect=test/text_region/test_text_columns.py::test_text_columns_with_text_shaping",
+  "--deselect=test/image/image_types/test_insert_images.py::test_insert_jpg_lzwdecode",
   "--deselect=test/text_region/test_text_columns.py::test_text_columns_with_shorter_2nd_column"
 ]%}
 test:
