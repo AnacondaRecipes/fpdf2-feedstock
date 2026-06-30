@@ -1,13 +1,13 @@
 {% set name = "fpdf2" %}
-{% set version = "2.8.4" %}
+{% set version = "2.8.7" %}
 
 package:
-  name: {{ name|lower }}
+  name: {{ name }}
   version: {{ version }}
 
 source:
-  url: https://github.com/py-pdf/fpdf2/archive/refs/tags/{{ version }}.tar.gz
-  sha256: b48a1d9826f8c307ddb5e0f5a0f838f3f4d18dbfcef14b98580ff3e7a870b801
+  url: https://github.com/py-pdf/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
+  sha256: cabfa24a1daffc3ab6ed02ca2203b64cee33af573725bab46c133c79f42546c5
   
 build:
   number: 0
@@ -19,32 +19,45 @@ requirements:
     - pip
     - python
     - setuptools
+    - wheel
+    - fonttools >=4.34.0
   run:
     - python
     - defusedxml
-    - pillow >=8.0.0,!=9.2.*
-    - fonttools >=4.34.0
+    - pillow >=8.3.2,!=9.2.*
 
-{% set pytest_skip = [
-  # Requires uharfbuzz
-  "test_encryption_unicode",
-  # Requires endesive
-  "test_sign_pkcs12",
-  "test_insert_jpg_jpxdecode",
-  "test_insert_jpg_flatedecode",
-  "test_insert_png_alpha_dctdecode",
-  "test_page_background"
-]%}
-{% set pytest_ignore = [
-  "--ignore=test/table/test_table_extraction.py",
-  "--ignore=test/text_shaping",
-  "--ignore=test/pdf-a/test_pdf_a.py",
-  "--deselect=test/image/test_url_images.py::test_png_url",
-  "--deselect=test/test_alias.py::test_alias_with_shaping",
-  "--deselect=test/text_region/test_text_columns.py::test_text_columns_with_text_shaping",
-  "--deselect=test/image/image_types/test_insert_images.py::test_insert_jpg_lzwdecode",
-  "--deselect=test/text_region/test_text_columns.py::test_text_columns_with_shorter_2nd_column"
-]%}
+# Requires uharfbuzz
+{% set pytest_skip = " test_encryption_unicode" %}
+{% set pytest_skip = pytest_skip + " or test_noto_emoji_shaping" %}
+{% set pytest_skip = pytest_skip + " or test_twemoji_shaping" %}
+{% set pytest_skip = pytest_skip + " or test_noto_colrv1_shaping" %}
+{% set pytest_skip = pytest_skip + " or test_twitter_emoji_shaping" %}
+{% set pytest_skip = pytest_skip + " or test_add_font_woff_shaping" %}
+{% set pytest_skip = pytest_skip + " or test_add_font_woff2" %}
+{% set pytest_skip = pytest_skip + " or test_add_font_woff2_shaping" %}
+{% set pytest_skip = pytest_skip + " or test_add_font_collection_shaping" %}
+
+{% set pytest_skip = pytest_skip + " or test_add_font_symbol" %}  # [win]
+{% set pytest_skip = pytest_skip + " or test_add_font_symbol_shaping" %}  # [win]
+
+# Requires endesive
+{% set pytest_skip = pytest_skip + " or test_encryption_unicode" %}
+{% set pytest_skip = pytest_skip + " or test_sign_pkcs12" %}
+{% set pytest_skip = pytest_skip + " or test_insert_jpg_jpxdecode" %}
+{% set pytest_skip = pytest_skip + " or test_insert_jpg_flatedecode" %}
+{% set pytest_skip = pytest_skip + " or test_insert_png_alpha_dctdecode" %}
+{% set pytest_skip = pytest_skip + " or test_page_background" %}
+
+{% set pytest_skip = pytest_skip + " or test_png_url" %}
+{% set pytest_skip = pytest_skip + " or test_alias_with_shaping" %}
+{% set pytest_skip = pytest_skip + " or test_text_columns_with_text_shaping" %}
+{% set pytest_skip = pytest_skip + " or test_insert_jpg_lzwdecode" %}
+{% set pytest_skip = pytest_skip + " or test_text_columns_with_shorter_2nd_column" %}
+
+{% set pytest_ignore = " --ignore=test/table/test_table_extraction.py" %}
+{% set pytest_ignore = pytest_ignore + " --ignore=test/text_shaping" %}
+{% set pytest_ignore = pytest_ignore + " --ignore=test/pdf-a/test_pdf_a.py" %}
+
 test:
   source_files:
     - test
@@ -54,14 +67,17 @@ test:
     - fpdf
   commands:
     - pip check
-    - pytest test {{pytest_ignore | join(" ")}} -k "not ({{ pytest_skip | join(" or ") }})"
+    - pytest test -vv {{ pytest_ignore }} -k "not ({{ pytest_skip }})"
   requires:
     - pip
     - pytest
     - pypdf
+    - brotli
     - qrcode
-    - cryptography
+    - tabula-py
+    - fonttools >=4.34.0
     - lxml
+    - cryptography
 
 about:
   home: https://pyfpdf.github.io/fpdf2
@@ -69,7 +85,7 @@ about:
   doc_url: https://py-pdf.github.io/fpdf2
   summary: Simple PDF generation for Python
   description: |
-    fpdf2 is a library for simple & fast PDF document generation 
+    fpdf2 is a library for simple & fast PDF document generation
     in Python. It is a fork and the successor of PyFPDF.
   license: LGPL-3.0-or-later
   license_file: LICENSE
