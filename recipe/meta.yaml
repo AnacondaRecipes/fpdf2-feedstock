@@ -10,8 +10,8 @@ source:
   sha256: cabfa24a1daffc3ab6ed02ca2203b64cee33af573725bab46c133c79f42546c5
   
 build:
-  number: 0
-  skip: true  # [py<39]
+  number: 1
+  skip: true  # [py<310]
   script: {{ PYTHON }} -m pip install . -vv --no-build-isolation --no-deps
 
 requirements:
@@ -20,11 +20,12 @@ requirements:
     - python
     - setuptools
     - wheel
-    - fonttools >=4.34.0
+    - fonttools ==4.63.0
   run:
     - python
     - defusedxml
     - pillow >=8.3.2,!=9.2.*
+    - fonttools >=4.34.0
 
 # Requires uharfbuzz
 {% set pytest_skip = " test_encryption_unicode" %}
