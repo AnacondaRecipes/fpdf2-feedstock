@@ -10,9 +10,13 @@ source:
   sha256: cabfa24a1daffc3ab6ed02ca2203b64cee33af573725bab46c133c79f42546c5
   
 build:
-  number: 1
+  number: 2
   skip: true  # [py<310]
-  script: {{ PYTHON }} -m pip install . -vv --no-build-isolation --no-deps
+  script:
+    # Anaconda channel packages are failing the downstream security scanner
+    # because these test fixtures contain encrypted/password-protected PDFs.
+    - rm -f ${SRC_DIR}/test/encryption/*.pdf
+    - {{ PYTHON }} -m pip install . -vv --no-build-isolation --no-deps
 
 requirements:
   host:
@@ -58,6 +62,23 @@ requirements:
 {% set pytest_ignore = " --ignore=test/table/test_table_extraction.py" %}
 {% set pytest_ignore = pytest_ignore + " --ignore=test/text_shaping" %}
 {% set pytest_ignore = pytest_ignore + " --ignore=test/pdf-a/test_pdf_a.py" %}
+
+# These tests require encrypted PDF fixtures removed from the package
+# to avoid triggering downstream security scanners.
+{% set pytest_skip = pytest_skip + " or test_encryption_rc4" %}
+{% set pytest_skip = pytest_skip + " or test_encryption_rc4_permissions" %}
+{% set pytest_skip = pytest_skip + " or test_no_encryption" %}
+{% set pytest_skip = pytest_skip + " or test_encryption_empty_user_password" %}
+{% set pytest_skip = pytest_skip + " or test_encryption_rc4_user_password" %}
+{% set pytest_skip = pytest_skip + " or test_encryption_aes128" %}
+{% set pytest_skip = pytest_skip + " or test_encrypt_metadata" %}
+{% set pytest_skip = pytest_skip + " or test_encrypt_font" %}
+{% set pytest_skip = pytest_skip + " or test_encrypt_with_hyperlink" %}
+{% set pytest_skip = pytest_skip + " or test_encrypt_outline" %}
+{% set pytest_skip = pytest_skip + " or test_encryption_aes256" %}
+{% set pytest_skip = pytest_skip + " or test_encryption_aes256_with_user_password" %}
+{% set pytest_skip = pytest_skip + " or test_goto_named_destination" %}
+{% set pytest_skip = pytest_skip + " or test_encryption_with_hyperlink" %}
 
 test:
   source_files:
